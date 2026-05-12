@@ -2,6 +2,10 @@
 
 All notable changes to this package are documented here.
 
+## 0.1.1 - 2026-05-12
+
+- Added an optional `bom` export setting for spreadsheet apps that need a UTF-8 byte order mark.
+
 ## 0.1.0 - 2026-05-12
 
 - Initial release with JSON records to CSV conversion.

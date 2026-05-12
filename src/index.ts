@@ -55,7 +55,8 @@ export function jsonToCsv<TRecord extends object>(
     lines.push(formatRow(row, resolved));
   }
 
-  return lines.join(resolved.newline);
+  const csv = lines.join(resolved.newline);
+  return resolved.bom ? `\uFEFF${csv}` : csv;
 }
 
 export const toCsv = jsonToCsv;
@@ -107,6 +108,7 @@ function resolveOptions<TRecord extends object>(
     arrayMode,
     arraySeparator,
     escapeFormulae,
+    bom: options.bom ?? false,
     dateFormatter: options.dateFormatter ?? ((date) => date.toISOString())
   };
 }

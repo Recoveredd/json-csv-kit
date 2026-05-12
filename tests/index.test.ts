@@ -138,6 +138,10 @@ describe('json-csv-kit', () => {
     ).toBe('name;role\r\nAda;Engineer');
   });
 
+  test('can prefix CSV output with a UTF-8 BOM', () => {
+    expect(jsonToCsv([{ name: 'Ada' }], { bom: true })).toBe('\uFEFFname\nAda');
+  });
+
   test('supports null values and dates', () => {
     expect(
       jsonToCsv(

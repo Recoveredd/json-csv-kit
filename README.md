@@ -213,6 +213,8 @@ value
 '=SUM(A1:A2)
 ```
 
+Use `bom: true` when a spreadsheet app needs the UTF-8 byte order mark to detect accented characters correctly.
+
 ## Options
 
 ```ts
@@ -228,6 +230,7 @@ interface JsonToCsvOptions<TRecord> {
   arrayMode?: 'json' | 'join' | 'empty';
   arraySeparator?: string;
   escapeFormulae?: boolean | string;
+  bom?: boolean;
   dateFormatter?: (date: Date) => string;
 }
 ```
@@ -245,6 +248,7 @@ interface JsonToCsvOptions<TRecord> {
 | `arrayMode` | `'json'` | format arrays as JSON, joined text or empty |
 | `arraySeparator` | `', '` | separator used by `arrayMode: 'join'` |
 | `escapeFormulae` | `false` | prefix spreadsheet-like formulas |
+| `bom` | `false` | prefix the output with a UTF-8 BOM for spreadsheet apps |
 | `dateFormatter` | ISO string | format `Date` values |
 
 ## Arrays, dates and null values

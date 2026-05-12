@@ -116,6 +116,13 @@ export interface JsonToCsvOptions<TRecord extends object = CsvRecord> {
   escapeFormulae?: boolean | string;
 
   /**
+   * Prefix the CSV with a UTF-8 byte order mark for spreadsheet apps.
+   *
+   * @default false
+   */
+  bom?: boolean;
+
+  /**
    * Format Date instances.
    *
    * @default date.toISOString()
@@ -135,6 +142,7 @@ export interface ResolvedJsonToCsvOptions<TRecord extends object = CsvRecord> {
   arrayMode: ArrayValueMode;
   arraySeparator: string;
   escapeFormulae: false | string;
+  bom: boolean;
   dateFormatter: (date: Date) => string;
 }
 

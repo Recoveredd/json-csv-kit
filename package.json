@@ -1,6 +1,6 @@
 {
   "name": "json-csv-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Convert JSON records to clean CSV with TypeScript-first options.",
   "type": "module",
   "sideEffects": false,
