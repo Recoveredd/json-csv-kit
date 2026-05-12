@@ -1,0 +1,56 @@
+{
+  "name": "json-csv-kit",
+  "version": "0.1.0",
+  "description": "Convert JSON records to clean CSV with TypeScript-first options.",
+  "type": "module",
+  "sideEffects": false,
+  "license": "MIT",
+  "author": "Recoveredd",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Recoveredd/json-csv-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Recoveredd/json-csv-kit/issues"
+  },
+  "homepage": "https://github.com/Recoveredd/json-csv-kit#readme",
+  "keywords": [
+    "json",
+    "csv",
+    "json-to-csv",
+    "export",
+    "table",
+    "typescript",
+    "browser"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build",
+    "test": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.8"
+  }
+}
