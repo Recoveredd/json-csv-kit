@@ -20,6 +20,8 @@ Convert JSON records to clean CSV with TypeScript-first options.
 npm install json-csv-kit
 ```
 
+`json-csv-kit` is ESM-only and targets Node.js 20 or newer. It also works in browsers through modern bundlers such as Vite, Rollup, webpack and esbuild.
+
 ## Quick Start
 
 ```ts
@@ -57,6 +59,8 @@ jsonToCsv([
 customer.name,customer.region,total
 Northwind,EU,120
 ```
+
+Column order is based on the first time each key is discovered while reading your records. Use `columns` when you need a stable public export format.
 
 ## Which API should I use?
 
@@ -111,6 +115,70 @@ jsonToCsv(rows, {
 ```
 
 The generic API accepts normal TypeScript interfaces; your row type does not need an index signature.
+
+```ts
+interface Order {
+  customer: {
+    name: string;
+  };
+  totalCents: number;
+}
+
+const orders: Order[] = [
+  { customer: { name: 'Ada' }, totalCents: 1234 }
+];
+
+const csv = jsonToCsv(orders, {
+  columns: [
+    { key: 'customer', path: 'customer.name' },
+    {
+      key: 'total',
+      accessor: (row) => row.totalCents,
+      formatter: (value) => `$${Number(value) / 100}`
+    }
+  ]
+});
+```
+
+## Browser download
+
+The package returns a string, so you can decide how to save or upload it.
+
+```ts
+import { jsonToCsv } from 'json-csv-kit';
+
+const csv = jsonToCsv(rows);
+const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+const url = URL.createObjectURL(blob);
+
+const link = document.createElement('a');
+link.href = url;
+link.download = 'export.csv';
+link.click();
+
+URL.revokeObjectURL(url);
+```
+
+## Nested data and paths
+
+With inferred columns, nested plain objects are flattened into dot-path keys. Arrays, dates and other non-plain values stay as values.
+
+```ts
+jsonToCsv([{ user: { name: 'Ada' }, tags: ['admin', 'ops'] }]);
+```
+
+```csv
+user.name,tags
+Ada,"[""admin"",""ops""]"
+```
+
+If a source object has a real key containing dots, direct keys are checked before dot-path traversal:
+
+```ts
+jsonToCsv([{ 'user.name': 'Ada' }]);
+```
+
+Use `accessor` when your source needs bracket notation, computed values or more control than simple dot paths.
 
 ## CSV safety
 
@@ -177,6 +245,33 @@ interface JsonToCsvOptions<TRecord> {
 | `escapeFormulae` | `false` | prefix spreadsheet-like formulas |
 | `dateFormatter` | ISO string | format `Date` values |
 
+## Arrays, dates and null values
+
+Arrays are serialized as JSON by default because that preserves the original data most safely:
+
+```ts
+jsonToCsv([{ tags: ['admin', 'ops'] }]);
+```
+
+Use `arrayMode: 'join'` for human-readable lists, or `arrayMode: 'empty'` when arrays should be skipped:
+
+```ts
+jsonToCsv([{ tags: ['admin', 'ops'] }], {
+  arrayMode: 'join',
+  arraySeparator: ' | '
+});
+```
+
+`null` and `undefined` are exported as an empty string by default. Use `nullValue` when your downstream tool needs an explicit marker:
+
+```ts
+jsonToCsv([{ name: 'Ada', team: null }], {
+  nullValue: 'NULL'
+});
+```
+
+Dates use `toISOString()` by default. Use `dateFormatter` for another format.
+
 ## Ecosystem recipes
 
 Use with `object-key-paths` to inspect columns before exporting:
@@ -223,7 +318,7 @@ const csv = jsonToCsv(rows);
 ## Notes
 
 - Input must be an array of plain objects.
-- Dot paths are intentionally simple. Use `accessor` or `object-path-kit` for bracket notation and keys containing dots.
+- Dot paths are intentionally simple. Use `accessor` or `object-path-kit` for bracket notation, ambiguous paths or computed values.
 - Arrays are serialized as JSON by default so no information is lost.
 - `BigInt` values inside arrays or objects are converted to strings during JSON serialization.
 - Circular references are represented as `[Circular]` instead of crashing the export.
