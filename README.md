@@ -1,12 +1,14 @@
 # json-csv-kit
 
+[![npm version](https://img.shields.io/npm/v/json-csv-kit.svg)](https://www.npmjs.com/package/json-csv-kit)
+[![License: MPL-2.0](https://img.shields.io/badge/license-MPL--2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/Recoveredd/json-csv-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/Recoveredd/json-csv-kit/actions/workflows/ci.yml)
 
 Convert JSON records to clean CSV with TypeScript-first options.
 
 `json-csv-kit` is a small utility for exports, admin tools, reports, support dashboards, docs generators and browser-based data tools. It keeps the common JSON-to-CSV path simple while leaving room for explicit columns, nested data and safe CSV escaping.
 
-Demo: [packages.wasta-wocket.fr/json-csv-kit/](https://packages.wasta-wocket.fr/json-csv-kit/)
+Links: [Demo](https://packages.wasta-wocket.fr/json-csv-kit/) · [npm](https://www.npmjs.com/package/json-csv-kit) · [GitHub](https://github.com/Recoveredd/json-csv-kit)
 
 ## Package quality
 
