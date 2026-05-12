@@ -56,6 +56,30 @@ describe('json-csv-kit', () => {
     expect(csv).toBe('total\n$12.34');
   });
 
+  test('accepts typed interfaces without an index signature', () => {
+    interface Order {
+      customer: {
+        name: string;
+      };
+      totalCents: number;
+    }
+
+    const orders: Order[] = [{ customer: { name: 'Ada' }, totalCents: 1234 }];
+
+    expect(
+      jsonToCsv(orders, {
+        columns: [
+          { key: 'customer', path: 'customer.name' },
+          {
+            key: 'total',
+            accessor: (row) => row.totalCents,
+            formatter: (value) => `$${Number(value) / 100}`
+          }
+        ]
+      })
+    ).toBe('customer,total\nAda,$12.34');
+  });
+
   test('flattens nested plain objects by default', () => {
     expect(jsonToCsv([{ user: { name: 'Ada' } }])).toBe('user.name\nAda');
   });
@@ -83,6 +107,16 @@ describe('json-csv-kit', () => {
     record.self = record;
 
     expect(jsonToCsv([record])).toBe('id,self\n1,[Circular]');
+  });
+
+  test('does not mark shared nested references as circular', () => {
+    const shared = { name: 'Ada' };
+
+    expect(
+      jsonToCsv([{ payload: { primary: shared, secondary: shared } }], {
+        flatten: false
+      })
+    ).toBe('payload\n"{""primary"":{""name"":""Ada""},""secondary"":{""name"":""Ada""}}"');
   });
 
   test('can join arrays', () => {
@@ -116,6 +150,12 @@ describe('json-csv-kit', () => {
   test('escapes spreadsheet formula values when requested', () => {
     expect(jsonToCsv([{ value: '=SUM(A1:A2)' }], { escapeFormulae: true })).toBe(
       "value\n'=SUM(A1:A2)"
+    );
+  });
+
+  test('escapes spreadsheet formula values after leading whitespace', () => {
+    expect(jsonToCsv([{ value: '  =SUM(A1:A2)' }], { escapeFormulae: true })).toBe(
+      "value\n'  =SUM(A1:A2)"
     );
   });
 

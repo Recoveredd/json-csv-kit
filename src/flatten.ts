@@ -1,6 +1,6 @@
 import type { CsvRecord } from './types.js';
 
-export function flattenRecord(record: CsvRecord, separator = '.'): CsvRecord {
+export function flattenRecord(record: object, separator = '.'): CsvRecord {
   const output: CsvRecord = {};
   flattenInto(record, '', output, separator, new WeakSet<object>());
   return output;

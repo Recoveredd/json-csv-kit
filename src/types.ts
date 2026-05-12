@@ -4,7 +4,7 @@ export type CsvRecord = Record<string, unknown>;
 
 export type ArrayValueMode = 'json' | 'join' | 'empty';
 
-export interface CsvColumn<TRecord extends CsvRecord = CsvRecord> {
+export interface CsvColumn<TRecord extends object = CsvRecord> {
   /**
    * Stable column id and default source path.
    */
@@ -35,11 +35,11 @@ export interface CsvColumn<TRecord extends CsvRecord = CsvRecord> {
   formatter?: (value: unknown, record: TRecord, index: number) => CsvPrimitive;
 }
 
-export type CsvColumnInput<TRecord extends CsvRecord = CsvRecord> =
+export type CsvColumnInput<TRecord extends object = CsvRecord> =
   | string
   | CsvColumn<TRecord>;
 
-export interface JsonToCsvOptions<TRecord extends CsvRecord = CsvRecord> {
+export interface JsonToCsvOptions<TRecord extends object = CsvRecord> {
   /**
    * Explicit columns. When omitted, columns are inferred from records.
    */
@@ -123,7 +123,7 @@ export interface JsonToCsvOptions<TRecord extends CsvRecord = CsvRecord> {
   dateFormatter?: (date: Date) => string;
 }
 
-export interface ResolvedJsonToCsvOptions<TRecord extends CsvRecord = CsvRecord> {
+export interface ResolvedJsonToCsvOptions<TRecord extends object = CsvRecord> {
   columns?: Array<CsvColumnInput<TRecord>>;
   includeHeaders: boolean;
   flatten: boolean;
@@ -138,7 +138,7 @@ export interface ResolvedJsonToCsvOptions<TRecord extends CsvRecord = CsvRecord>
   dateFormatter: (date: Date) => string;
 }
 
-export interface ResolvedCsvColumn<TRecord extends CsvRecord = CsvRecord> {
+export interface ResolvedCsvColumn<TRecord extends object = CsvRecord> {
   key: string;
   header: string;
   path: string;

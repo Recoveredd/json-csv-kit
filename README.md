@@ -110,6 +110,8 @@ jsonToCsv(rows, {
 });
 ```
 
+The generic API accepts normal TypeScript interfaces; your row type does not need an index signature.
+
 ## CSV safety
 
 Values are escaped according to normal CSV rules:
@@ -128,7 +130,7 @@ name,note
 ""Line 2"""
 ```
 
-When exporting to spreadsheets, use `escapeFormulae` to reduce formula-injection risk:
+When exporting to spreadsheets, use `escapeFormulae` to reduce formula-injection risk. Values that start with a formula marker, even after leading whitespace, are prefixed before CSV escaping:
 
 ```ts
 jsonToCsv([{ value: '=SUM(A1:A2)' }], {

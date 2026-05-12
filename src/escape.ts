@@ -23,5 +23,5 @@ export function escapeCsvCell(value: string, options: EscapeCsvCellOptions = {})
 }
 
 function startsLikeFormula(value: string): boolean {
-  return /^[=+\-@\t\r]/.test(value);
+  return /^\s*[=+\-@]/.test(value) || /^[\t\r]/.test(value);
 }

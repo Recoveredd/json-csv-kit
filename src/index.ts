@@ -3,7 +3,6 @@ import { flattenRecord, isPlainObject } from './flatten.js';
 import type {
   CsvColumnInput,
   CsvPrimitive,
-  CsvRecord,
   JsonToCsvOptions,
   ResolvedCsvColumn,
   ResolvedJsonToCsvOptions
@@ -15,13 +14,14 @@ export type {
   CsvColumnInput,
   CsvPrimitive,
   CsvRecord,
-  JsonToCsvOptions
+  JsonToCsvOptions,
+  ResolvedCsvColumn
 } from './types.js';
 
 export { escapeCsvCell } from './escape.js';
 export { flattenRecord } from './flatten.js';
 
-export function jsonToCsv<TRecord extends CsvRecord>(
+export function jsonToCsv<TRecord extends object>(
   records: readonly TRecord[],
   options: JsonToCsvOptions<TRecord> = {}
 ): string {
@@ -60,7 +60,7 @@ export function jsonToCsv<TRecord extends CsvRecord>(
 
 export const toCsv = jsonToCsv;
 
-export function inferCsvColumns<TRecord extends CsvRecord>(
+export function inferCsvColumns<TRecord extends object>(
   records: readonly TRecord[],
   options: Pick<JsonToCsvOptions<TRecord>, 'flatten' | 'sortColumns'> = {}
 ): Array<ResolvedCsvColumn<TRecord>> {
@@ -68,7 +68,7 @@ export function inferCsvColumns<TRecord extends CsvRecord>(
   return resolveColumns(assertRecords(records), resolved);
 }
 
-function resolveOptions<TRecord extends CsvRecord>(
+function resolveOptions<TRecord extends object>(
   options: JsonToCsvOptions<TRecord>
 ): ResolvedJsonToCsvOptions<TRecord> {
   const delimiter = options.delimiter ?? ',';
@@ -111,7 +111,7 @@ function resolveOptions<TRecord extends CsvRecord>(
   };
 }
 
-function assertRecords<TRecord extends CsvRecord>(records: readonly TRecord[]): readonly TRecord[] {
+function assertRecords<TRecord extends object>(records: readonly TRecord[]): readonly TRecord[] {
   if (!Array.isArray(records)) {
     throw new TypeError('json-csv-kit expects an array of records.');
   }
@@ -125,7 +125,7 @@ function assertRecords<TRecord extends CsvRecord>(records: readonly TRecord[]): 
   return records;
 }
 
-function resolveColumns<TRecord extends CsvRecord>(
+function resolveColumns<TRecord extends object>(
   records: readonly TRecord[],
   options: ResolvedJsonToCsvOptions<TRecord>
 ): Array<ResolvedCsvColumn<TRecord>> {
@@ -136,7 +136,7 @@ function resolveColumns<TRecord extends CsvRecord>(
   const keys = new Set<string>();
 
   for (const record of records) {
-    const source = options.flatten ? flattenRecord(record) : record;
+    const source: object = options.flatten ? flattenRecord(record) : record;
 
     for (const key of Object.keys(source)) {
       keys.add(key);
@@ -156,7 +156,7 @@ function resolveColumns<TRecord extends CsvRecord>(
   }));
 }
 
-function resolveColumn<TRecord extends CsvRecord>(
+function resolveColumn<TRecord extends object>(
   column: CsvColumnInput<TRecord>
 ): ResolvedCsvColumn<TRecord> {
   if (typeof column === 'string') {
@@ -176,7 +176,7 @@ function resolveColumn<TRecord extends CsvRecord>(
   };
 }
 
-function readColumnValue<TRecord extends CsvRecord>(
+function readColumnValue<TRecord extends object>(
   record: TRecord,
   column: ResolvedCsvColumn<TRecord>,
   index: number
@@ -188,9 +188,9 @@ function readColumnValue<TRecord extends CsvRecord>(
   return getPath(record, column.path);
 }
 
-function getPath(record: CsvRecord, path: string): unknown {
+function getPath(record: object, path: string): unknown {
   if (Object.hasOwn(record, path)) {
-    return record[path];
+    return (record as Record<string, unknown>)[path];
   }
 
   const segments = path.split('.');
@@ -201,13 +201,13 @@ function getPath(record: CsvRecord, path: string): unknown {
       return undefined;
     }
 
-    current = (current as CsvRecord)[segment];
+    current = (current as Record<string, unknown>)[segment];
   }
 
   return current;
 }
 
-function formatRow<TRecord extends CsvRecord>(
+function formatRow<TRecord extends object>(
   values: readonly string[],
   options: ResolvedJsonToCsvOptions<TRecord>
 ): string {
@@ -222,7 +222,7 @@ function formatRow<TRecord extends CsvRecord>(
     .join(options.delimiter);
 }
 
-function formatValue<TRecord extends CsvRecord>(
+function formatValue<TRecord extends object>(
   value: unknown,
   options: ResolvedJsonToCsvOptions<TRecord>
 ): string {
@@ -254,21 +254,40 @@ function formatValue<TRecord extends CsvRecord>(
 }
 
 function safeJsonStringify(value: unknown): string {
-  const seen = new WeakSet<object>();
+  return JSON.stringify(toJsonSafe(value, new WeakSet<object>())) ?? '';
+}
 
-  return JSON.stringify(value, (_key, child) => {
-    if (typeof child === 'bigint') {
-      return String(child);
-    }
+function toJsonSafe(value: unknown, seen: WeakSet<object>): unknown {
+  if (typeof value === 'bigint') {
+    return String(value);
+  }
 
-    if (child && typeof child === 'object') {
-      if (seen.has(child)) {
-        return '[Circular]';
-      }
+  if (!value || typeof value !== 'object') {
+    return value;
+  }
 
-      seen.add(child);
-    }
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
 
-    return child;
-  }) ?? '';
+  if (seen.has(value)) {
+    return '[Circular]';
+  }
+
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    const output = value.map((item) => toJsonSafe(item, seen));
+    seen.delete(value);
+    return output;
+  }
+
+  const output: Record<string, unknown> = {};
+
+  for (const [key, child] of Object.entries(value)) {
+    output[key] = toJsonSafe(child, seen);
+  }
+
+  seen.delete(value);
+  return output;
 }
