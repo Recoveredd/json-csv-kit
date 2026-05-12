@@ -6,7 +6,7 @@ Convert JSON records to clean CSV with TypeScript-first options.
 
 `json-csv-kit` is a small utility for exports, admin tools, reports, support dashboards, docs generators and browser-based data tools. It keeps the common JSON-to-CSV path simple while leaving room for explicit columns, nested data and safe CSV escaping.
 
-Demo: https://packages.wasta-wocket.fr/json-csv-kit
+Demo: [packages.wasta-wocket.fr/json-csv-kit/](https://packages.wasta-wocket.fr/json-csv-kit/)
 
 ## Package quality
 
