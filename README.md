@@ -328,4 +328,4 @@ const csv = jsonToCsv(rows);
 
 ## License
 
-MIT
+MPL-2.0

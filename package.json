@@ -4,7 +4,7 @@
   "description": "Convert JSON records to clean CSV with TypeScript-first options.",
   "type": "module",
   "sideEffects": false,
-  "license": "MIT",
+  "license": "MPL-2.0",
   "author": "Recoveredd",
   "repository": {
     "type": "git",
