@@ -2,6 +2,15 @@
   "name": "json-csv-kit",
   "version": "0.1.1",
   "description": "Convert JSON records to clean CSV with TypeScript-first options.",
+  "keywords": [
+    "json",
+    "csv",
+    "json-to-csv",
+    "data-export",
+    "typescript",
+    "browser",
+    "developer-tools"
+  ],
   "type": "module",
   "sideEffects": false,
   "license": "MPL-2.0",
@@ -14,15 +23,6 @@
     "url": "https://github.com/Recoveredd/json-csv-kit/issues"
   },
   "homepage": "https://github.com/Recoveredd/json-csv-kit#readme",
-  "keywords": [
-    "json",
-    "csv",
-    "json-to-csv",
-    "export",
-    "table",
-    "typescript",
-    "browser"
-  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
